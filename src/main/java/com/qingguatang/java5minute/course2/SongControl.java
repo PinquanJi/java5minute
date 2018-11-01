@@ -16,9 +16,9 @@ public class SongControl {
             songId = "1";
         }
         if(songId.equals("1")){
-            return"course2/1.html";
+            return "course2/1.html";
         }else{
-            return"course2/other.html";
+            return "course2/other.html";
         }
 
     }
