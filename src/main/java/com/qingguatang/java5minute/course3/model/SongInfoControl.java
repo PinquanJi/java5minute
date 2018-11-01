@@ -31,9 +31,11 @@ public class SongInfoControl {
             songId = "35847388";
         }
         SongInfo songInfo = songInfoMap.get(songId);
-
         modelMap.addAttribute("song",songInfo);
-        List<Comment> commnets = commentPostControl.getComments(songId);
+
+        List<Comment> comments = commentPostControl.getComments(songId);
+        modelMap.addAttribute("comments",comments);
+
         return "index";
 
     }
@@ -62,13 +64,10 @@ public class SongInfoControl {
         songInfo.setName("Set Fire to the Rain");
         songInfo.setSinger("Adele");
         songInfo.setAlbumName("21");
-        songInfo.setCommentCount(10);
+        songInfo.setCommentCount(12960);
         songInfo.setAlbumImg("http://p2.music.126.net/1Ep5P29fQ0cepjr-OnnTHA==/18154036486504197.jpg?param=130y130");
         songInfo.setLyrics("I let it fall, my heart<br/>我本任由我心沉沦着<br/>And as it fell, you rose to claim it");
         songInfoMap.put("2117009",songInfo);
-
-
-
 
         }
 }
