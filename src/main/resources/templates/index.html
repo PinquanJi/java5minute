@@ -3,22 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="/jquery-3.3.1.min.js"></script>
 </head>
+
 <body>
 
-<img data-th-src="${song.albumImg}"/>
-<h1 data-th-text="${song.name}"></h1>
+<img class="song-albumImg" data-th-src="${song.albumImg}"/>
+<h1 class="song-name" data-th-text="${song.name}"></h1>
+<a href="#" data-th-data-id="${song.id}" class="player-btn">播放</a>
+<audio id="player" style="display: none;" src="" controls="controls"></audio>
 
 <h3>
-    <label>歌手：<span data-th-text="${song.singer}"></span></label>
+    <label>歌手:</label><span class="song-singer" data-th-text="${song.singer}"></span>
 </h3>
+<h3>
+    <label>所属专辑:</label><span class="song-albumName" data-th-text="${song.albumName}"></span>
+</h3>
+<h3>
+    <label>评论数:</label><span class="song-commentCount" data-th-text="${song.commentCount}"></span>
+</h3>
+<div data-th-utext="${song.lyrics}" class="song-lyrics"></div>
+<h3>相似歌曲</h3>
+<ul>
+    <li>
+        <a href="#" class="change-song" data-id="2117009">Set Fire to the Rain</a>
+        <a href="#" class="player-btn" data-id="2117009">播放</a>
+    </li>
+</ul>
 
-<h3>
-    <label>所属专辑:</label><span data-th-text="${song.albumName}"></span>
-</h3>
-<h3>
-    <label>评论数:</label><span data-th-text="${song.commentCount}"></span>
-</h3>
-<div data-th-utext="${song.lyrics}"></div>
+<h1>评论</h1>
+<form action="/comment/post" method="post">
+    <input type="hidden" name="nickName" value="bmatch">
+    <input type="hidden" name="songId" value="35847388"/>
+    <input name="content" type="text" style="width: 80%; height: 100px;" placeholder="填写你的评论"/>
+    <br/>
+    <button type="submit">评论</button>
+</form>
+
+<h3>精彩评论</h3>
+<ul data-th-each="comment:${comments}">
+    <li>
+        <img data-th-src="${comment.icon}"/>
+        <span data-th-text="${comment.nickName}"></span>
+        <span data-th-text="${comment.content}"></span>
+    </li>
+    <li>
+        <label>评论时间</label>
+        <span data-th-text="${#dates.format(comment.commentTime,'yyyy-MM-dd HH:mm:ss')}"></span>
+        <label>点赞数</label>
+        <a href="#" data-th-data-id="${comment.id}" class="like-btn"><span
+                data-th-text="${comment.likeNum}"></span></a>
+    </li>
+</ul>
+
+<script>
+
+
+    $(function() {
+        $(".player-btn").on('click', function(e) {
+            e.preventDefault();
+            var songId = $(this).data("id");
+            $.ajax({
+                url: "/song/music",
+                method: "GET",
+                data: {
+                    songId: songId
+                },
+                cache: false
+            })
+                .done(function(data) {
+                $("#player").show();
+                $("#player").attr("src", data);
+                document.getElementById("player").play();
+            });
+        });
+
+//处理切换歌曲
+    $(".change-song").on('click',function (e) {
+        e.preventDefault();
+        var songId = $(this).data("id");
+        $.ajax({
+            url:"/songinfo/get",
+            method:"GET",
+            data:{
+                songId:songId
+            },
+            cache:false
+        })
+            .done(function (data) {
+                $('.song-albumImg').attr('src',data.albumImg);
+                $('.song-albumName').html(data.albumName);
+                $('.song-commentCount').html(data.commentCount);
+                $('.song-lyrics').html(data.lyrics);
+                $('.song-name').html(data.name);
+                $('.song-singer').html(data.singer);
+            });
+    });
+    $(".like-btn").on('click',function (e) {
+        e.preventDefault();
+        var self = $(this);
+        var commentId = self.data('id');
+        $.ajax({
+            url: "/comment/like",
+            method: "POST",
+            data: {
+                songId: "35847388",
+                commentId: commentId
+            },
+            cache: false
+        })
+            .done(function (data) {
+                self.html(data.likeNum);
+
+            });
+
+    });
+    });
+</script>
 </body>
 </html>
